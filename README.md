@@ -1,12 +1,10 @@
-# Project Title: SARCASM DETECTION IN TEXT
+z# Project Title: SARCASM DETECTION IN TEXT
 
 **Problem Statement:** 
 Sarcasm relies on subtext, cultural context, and irony, causing traditional keyword-based NLP pipelines to misclassify negative or absurd statements as positive. Failing to detect sarcasm corrupts downstream analytics, automated content moderation, and customer sentiment tracking.
 
 **Objectives / Expected Outcome:** 
-To build an interpretable Machine Learning pipeline capable of distinguishing between legitimate news and sarcastic text
-Auditing it for length-based biases
-Extracting the exact vocabulary features driving the model's predictions both globally and locally.
+To build an interpretable Machine Learning pipeline capable of distinguishing between legitimate news and sarcastic text, auditing it for length-based biases and extracting the exact vocabulary features driving the model's predictions both globally and locally.
 
 **Dataset Name and Link:** 
 News Headlines Dataset for Sarcasm Detection (Rishabh Misra) | [Kaggle Link](https://www.kaggle.com/datasets/rmisra/news-headlines-dataset-for-sarcasm-detection)
