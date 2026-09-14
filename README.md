@@ -10,7 +10,7 @@ To build an interpretable Machine Learning pipeline capable of distinguishing be
 News Headlines Dataset for Sarcasm Detection (Rishabh Misra) | [Kaggle Link](https://www.kaggle.com/datasets/rmisra/news-headlines-dataset-for-sarcasm-detection)
 
 **Dataset Source / License:** 
-Sourced from The Onion and HuffPost. Available on Kaggle for research and academic use (Requires citation to author Rishabh Misra).
+Sourced from The Onion and HuffPost. Author: Rishabh Misra. Dataset License: CC BY 4.0
 
 **Proposed Method / Tools / Libraries:** 
 * Algorithm: TF-IDF Vectorization + Logistic Regression
