@@ -1,4 +1,4 @@
-z# Project Title: SARCASM DETECTION IN TEXT
+## Project Title: SARCASM DETECTION IN TEXT
 
 **Problem Statement:** 
 Sarcasm relies on subtext, cultural context, and irony, causing traditional keyword-based NLP pipelines to misclassify negative or absurd statements as positive. Failing to detect sarcasm corrupts downstream analytics, automated content moderation, and customer sentiment tracking.
