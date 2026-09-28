@@ -33,7 +33,7 @@ Text preprocessing is kept minimal but essential:
 
 *Note: Logistic Regression was selected as the focal point over a neural network to guarantee 100% mathematical explainability, allowing us to audit exactly which vocabulary terms influence the decision threshold.*
 
-## 📈 Final Test Performance Metrics
+## Final Test Performance Metrics
 
 | Metric | Logistic Regression | Naive Bayes |
 | :--- | :--- | :--- |
@@ -67,5 +67,5 @@ Because Logistic Regression assigns a concrete mathematical coefficient to every
 * **🔴 Sarcasm Signals:** The highest positive coefficients belong to *area, report, man, nation, local*. *The Onion* frequently relies on the trope "Area Man Does X," establishing these generic nouns as heavy satire indicators.
 * **🟢 Real News Signals:** The lowest negative coefficients belong to *donald, trump, california, watch, heres*. *HuffPost* heavily utilizes political entities, state names, and multimedia tags in its standard reporting.
 
-## ⚠️ Model Limitations & Caveats
+## Model Limitations & Caveats
 The primary failure mode is that the model has not learned abstract human sarcasm; it has learned publication style. It relies heavily on structural formulas (e.g., "Area Man...") rather than semantic irony. Consequently, it fails completely on "dry" or context-dependent sarcasm (e.g., "I absolutely love being stuck in traffic") where the individual vocabulary is standard, but the premise is absurd to a human reader.
