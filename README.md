@@ -6,20 +6,19 @@
 Sarcasm relies on subtext, cultural context, and irony, causing traditional keyword-based NLP pipelines to misclassify negative or absurd statements as positive. Failing to detect sarcasm corrupts downstream analytics, automated content moderation, and customer sentiment tracking.
 
 ## Objectives
-To build an interpretable Machine Learning pipeline capable of distinguishing between legitimate news and sarcastic text, auditing it across text subgroups (length, style, numbers), and extracting the exact vocabulary features driving the model's predictions both globally and locally.
+Build an interpretable ML pipeline that separates legitimate news from sarcastic text, audit it across text subgroups (length, style, numbers), and extract the exact vocabulary driving its predictions both globally and locally.
 
 ## Dataset
 * **Name:** News Headlines Dataset for Sarcasm Detection v2
 * **Source:** The Onion (sarcastic) and HuffPost (real)
-* **Author:** Rishabh Misra
-* **License:** CC BY 4.0
+* **Author:** Rishabh Misra | **License:** CC BY 4.0
 * **Size:** 28,503 unique headlines, 47.5% sarcastic
 * **Link:** [Kaggle Dataset](https://www.kaggle.com/datasets/rmisra/news-headlines-dataset-for-sarcasm-detection)
 
-> **Important:** the label records which *outlet* wrote the headline, not whether a human judged it sarcastic. This shapes every limitation below.
+> **Important:** the label records which *outlet* wrote the headline, not whether a human judged it sarcastic.
 
 ## Proposed Method & Tech Stack
-* **Algorithm:** Text Lemmatization + TF-IDF Vectorization + Logistic Regression / Multinomial Naive Bayes
+* **Algorithm:** Lemmatization + TF-IDF + Logistic Regression (baseline: Multinomial Naive Bayes)
 * **Libraries:** Python, Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn, NLTK
 
 ---
@@ -27,91 +26,89 @@ To build an interpretable Machine Learning pipeline capable of distinguishing be
 ## Project Pipeline & Business Impact
 
 ### Business Impact
-In a business context, failing to detect sarcasm poisons automated sentiment pipelines. A customer tweeting, "Brilliant, my software crashed again," will be incorrectly tagged as highly positive due to the word "brilliant." Building an initial classification layer to isolate sarcasm protects data integrity, ensuring angry customers are routed to human agents rather than receiving tone-deaf automated responses.
+A customer tweeting "Brilliant, my software crashed again" is tagged positive because of the word "brilliant". A first-pass sarcasm filter protects sentiment data and routes angry customers to human agents instead of tone-deaf automated replies.
 
 ### Preprocessing & Approach
-1. All text is lowercased, and punctuation is stripped via Regex.
-2. Each word is reduced to its base dictionary form using **NLTK's WordNet Lemmatizer**.
-3. A **TF-IDF Vectorizer** capped at 10,000 features captures single words and two-word phrases (unigrams and bigrams) and removes English stop words. The vocabulary is learned on the training set only, so there is no data leakage.
-4. A **Logistic Regression classifier** (C=1.5, max iterations 1000) makes the primary prediction. A **Multinomial Naive Bayes** model serves as the baseline.
-5. Split: 80% train / 20% test with a fixed seed (42).
+1. Lowercase and strip punctuation with a regex.
+2. Reduce words longer than 3 letters to their base form with NLTK's WordNet Lemmatizer (short words are skipped because WordNet turns "has" into "ha").
+3. TF-IDF, 10,000 features, unigrams and bigrams, English stop words removed. The vocabulary is learned on training data only (no leakage).
+4. Logistic Regression with C=3, chosen by 5-fold cross-validation on the training set; Naive Bayes as baseline. 80/20 split, seed 42.
 
-*Note: Logistic Regression was selected over a neural network because each word receives one readable weight, so the model's behaviour can be explained exactly, with no approximation.*
+*Logistic Regression was chosen over a neural network because each word gets one readable weight, so predictions can be explained exactly.*
 
 ## Final Test Performance Metrics
 
 | Metric (sarcasm class) | Logistic Regression | Naive Bayes |
 | :--- | :--- | :--- |
-| **Overall Accuracy** | 79.62% | 79.51% |
-| **Precision** | 79.60% | 79.48% |
-| **Recall** | 75.57% | 75.46% |
-| **F1** | 0.775 | 0.774 |
-| **AUC** | 0.878 | 0.881 |
+| **Accuracy** | 79.72% | 79.60% |
+| **Precision** | 79.00% | 79.42% |
+| **Recall** | 76.86% | 75.80% |
+| **F1** | 0.779 | 0.776 |
+| **AUC** | 0.878 | 0.880 |
 
-> Evaluated on 5,701 unseen test headlines. The two models are almost tied, so Logistic Regression is the final model because its weights can be audited directly. Precision (0.80) and recall (0.76) are balanced, so the model is not simply favouring one class.
+> Evaluated once on 5,701 unseen test headlines. The models are nearly tied, so Logistic Regression is final because its weights can be audited directly. Precision and recall are balanced.
 
 ---
 
 ## Model Card & Audit
 
 ### Model Details & Intended Use
-* **Architecture:** Logistic Regression on TF-IDF sparse matrices (unigrams and bigrams).
-* **Intended Use:** A pre-filtering layer that flags possibly sarcastic text for manual review before data is passed to literal sentiment analysis models. For learning and demonstration; not for decisions about people.
-* **Out-of-Scope:** Multi-paragraph documents, spoken audio, and non-English text.
+* **Architecture:** Logistic Regression on TF-IDF sparse matrices.
+* **Intended Use:** a pre-filter that flags possibly sarcastic text for manual review before literal sentiment analysis. For learning and demonstration; not for decisions about people.
+* **Out-of-Scope:** multi-paragraph documents, spoken audio, non-English text.
 
 ### Subgroup Audit Results
-The test set was split along three independent axes. False-positive rate (FPR) is the share of *real* headlines wrongly flagged, which equals wasted human review effort.
+FPR = share of *real* headlines wrongly flagged (wasted human review).
 
 | Axis | Subgroup | n | Accuracy | Sarcasm Recall | FPR |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Length** | Short (< 10 words) | 2,489 | 78.1% | 73.4% | 17.6% |
-| | Long (>= 10 words) | 3,212 | 80.8% | 77.4% | 16.4% |
-| **Style** | Question | 165 | 77.6% | 56.5% | 19.0% |
-| | Statement | 5,536 | 79.7% | 75.7% | 16.8% |
-| **Numbers** | Has a number | 811 | 81.6% | 75.3% | 12.6% |
-| | No number | 4,890 | 79.3% | 75.6% | 17.6% |
+| **Length** | Short (< 10 words) | 2,489 | 77.8% | 74.1% | 18.7% |
+| | Long (10+ words) | 3,212 | 81.2% | 79.2% | 17.1% |
+| **Style** | Question | 165 | 79.4% | 60.9% | 17.6% |
+| | Statement | 5,536 | 79.7% | 77.0% | 17.8% |
+| **Numbers** | Has a number | 811 | 82.0% | 78.9% | 15.2% |
+| | No number | 4,890 | 79.3% | 76.5% | 18.2% |
 
-**Is each accuracy gap real?** 1,000 bootstrap resamples of the test set give a 95% interval for each gap:
+**Are the gaps real?** Gap in points (first minus second group) with a 95% bootstrap interval from 1,000 resamples:
 
-| Axis | Gap (pts) | 95% CI | Verdict |
-| :--- | :--- | :--- | :--- |
-| Length (long - short) | +2.76 | 0.59 to 4.90 | Real gap |
-| Style (question - statement) | -2.10 | -8.37 to 4.31 | Could be noise |
-| Numbers (has - none) | +2.34 | -0.47 to 5.01 | Could be noise |
+| Axis | Accuracy gap | Sarcasm-recall gap |
+| :--- | :--- | :--- |
+| Long - short | +3.37 (1.22 to 5.54), real gap | +5.08 (2.02 to 8.33), real gap |
+| Question - statement | -0.34 (-6.7 to 5.83), could be noise | -16.13 (-36.02 to 2.35), could be noise |
+| Has number - none | +2.65 (-0.31 to 5.56), could be noise | +2.40 (-2.07 to 6.83), could be noise |
 
-**Audit Insight:** Short headlines are the confirmed weak spot. TF-IDF relies on cumulative word weights, so short sentences offer fewer signals to overcome the decision threshold. Question headlines show the lowest sarcasm recall (56.5%), but on only 165 headlines, so that result needs caution.
+**Audit Insight:** long headlines beat short ones by 3.37 accuracy points (real gap); short text gives TF-IDF fewer signals to work with. The lowest sarcasm recall is for *Question* (60.9%, n=165); bootstrap verdict: **could be noise**, so treat it with caution.
 
 ### Top Feature Explanations
-Because Logistic Regression assigns a concrete coefficient to every word, a headline's score is `intercept + sum(tfidf value x word weight)`, an exact explanation.
-* **🔴 Sarcasm Signals:** The highest positive coefficients belong to *nation, area, man, report, local*. *The Onion* frequently relies on the trope "Area Man Does X," making these generic nouns strong satire indicators.
-* **🟢 Real News Signals:** The lowest negative coefficients belong to *trump, donald, donald trump, queer, muslim*. *HuffPost* heavily covers political figures and social topics.
-* **Local example:** "Area man wins argument with thermostat" scores 0.99 sarcastic, driven by *area* (+2.50), *man* (+1.87) and *area man* (+0.85).
+A headline's score is `intercept + sum(tfidf value x word weight)`, an exact explanation.
+* **🔴 Sarcasm Signals:** *area, nation, report, man, clearly*. The Onion often uses the "Area Man Does X" formula.
+* **🟢 Real News Signals:** *queer, trump, allegedly, trans, donald*. HuffPost covers political figures and social topics.
 
-### Evidence the Model Leans on Outlet Style
-Retraining after removing the words behind the 25 strongest weights on each side (49 words) lowers accuracy from 79.62% to 75.81% (**-3.81 pts**). Removing 49 *random* words changes it by only **-0.04 pts**. A small set of outlet-style cues carries a disproportionate share of the signal.
+### Reliance on a Few Outlet-Style Words
+Removing the words behind the 25 strongest weights per side (49 words) and retraining changes accuracy by **-3.53 pts**. Removing 49 random words changes it by **-0.18 pts**. A small set of outlet-style cues carries a disproportionate share of the signal (evidence, not proof).
 
-### Stress Test (19 hand-written texts)
+### Stress Test (24 hand-written texts, 4 per category)
 
 | Category | Accuracy |
 | :--- | :--- |
 | Onion-style sarcasm | 100% |
-| Explicit markers ("yeah right", "/s") | 100% |
-| Real news | 80% |
-| Sincere negative | 50% |
+| Explicit markers | 75% |
+| Real news | 75% |
 | Dry sarcasm | 25% |
-| Sincere positive | 0% |
-| **Overall** | **63%** |
+| Sincere negative | 25% |
+| Sincere positive | 25% |
+| **Overall** | **54%** |
 
-The sample is tiny, so treat this as indicative only.
+Mostly non-headline text, so part of any failure is distribution shift. Indicative only.
 
 ### Calibration
-Predicted probabilities are reasonably calibrated around 0.5 (observed sarcasm rate 49.8% for predictions in 0.4 to 0.6), and slightly under-confident at the extremes (the 0.8 to 1.0 bin predicts 89.6% but observes 94.4%).
+In the middle probability bin the model says 0.50 and the observed sarcasm rate is 0.51; the largest gap in any bin is 0.03.
 
 ## Model Limitations & Caveats
-1. **The labels measure the outlet, not sarcasm.** The model has largely learned publication style and structural formulas (e.g., "Area Man...") rather than semantic irony, so it may fail on sarcasm from other sources such as tweets and reviews.
-2. **Dry or context-dependent sarcasm is missed.** On the hand-written set it catches only 1 of 4 examples such as "I absolutely love being stuck in traffic", and it wrongly flags sincere, casual statements as sarcastic, because their vocabulary looks unlike HuffPost headlines.
-3. **Uneven subgroup performance.** Short headlines are weaker (confirmed), and question headlines have low recall on a small sample.
+1. **Labels measure the outlet, not sarcasm.** The model leans on publication style and formulas such as "Area Man...", so it may fail on sarcasm from other sources (tweets, reviews).
+2. **Dry, context-dependent sarcasm is missed** (25% correct on the hand-written set), and sincere casual text is often wrongly flagged (75% of sincere positive examples).
+3. **Uneven subgroup performance** (table above); small groups need caution.
 4. **No context or tone.** Bag-of-words sees word order only through bigrams.
-5. **Narrow data.** English, US news headlines from a fixed time period.
+5. **Narrow data:** English, US news headlines from a fixed period.
 
-**Recommendation:** re-test on text from a different source before any real use, and consider a transformer model (such as BERT) for context-aware detection.
+**Recommendation:** re-test on text from another source before any real use, and consider a transformer such as BERT for context-aware detection.
