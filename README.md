@@ -5,9 +5,9 @@ This project explores sarcasm detection in news headlines using Natural Language
 
 ## Repository Contents
 - `CA3_Sarcasm_Detection_Final.ipynb` — Complete Google Colab notebook containing the project workflow.
-- `sarcasm_detector_website.html` — Website interface for the sarcasm detection project.
-- `Sarcasm_Detection_Model_Card.pdf` — Model card documenting the model, intended use, performance, limitations, and recommendations.
-- `presentation.pptx` — Project presentation.
+- `Sarcasm Lens.html` — Website interface for the sarcasm detection project.
+- `Model_Card_Sarcasm_Detector.pdf` — Model card documenting the model, intended use, performance, limitations, and recommendations.
+- `Sarcasm_Detection_Presentation.pptx` — Project presentation.
 
 ## How to Run the Notebook
 1. Download `CA3_Sarcasm_Detection_Final.ipynb` or open it from this repository.
